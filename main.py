@@ -1,8 +1,38 @@
 import requests
+from scrapy import Selector
+import pandas as pd
+import json
+import datetime
+import re
+
+def parse_address(address):
+    # Regular expression pattern to match the postal code
+    postal_code_pattern = r'\b[A-Za-z]\d[A-Za-z]\s*\d[A-Za-z]\d\b'
+
+    # Regular expression pattern to match the city
+    city_pattern = r'([^,]+),'
+
+    # Regular expression pattern to match the state
+    state_pattern = r',\s*([A-Za-z\s]+)'
+
+    # Search for postal code
+    postal_code_match = re.search(postal_code_pattern, address)
+    postal_code = postal_code_match.group() if postal_code_match else None
+
+    # Search for city
+    city_match = re.search(city_pattern, address)
+    city = city_match.group(1).strip() if city_match else None
+
+    # Search for state
+    state_match = re.search(state_pattern, address)
+    state = state_match.group(1).strip() if state_match else None
+
+    return city, state, postal_code
+
 
 url = "https://api2.realtor.ca/Listing.svc/PropertySearch_Post"
 
-payload = "CurrentPage=3&Sort=6-D&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=12&ApplicationId=1&CultureId=1&Version=7.0"
+payload = "CurrentPage=3&Sort=6-D&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=40&ApplicationId=1&CultureId=1&Version=7.0"
 headers = {
   'accept': '*/*',
   'accept-language': 'en-US,en;q=0.9',
@@ -21,5 +51,44 @@ headers = {
 }
 
 response = requests.request("POST", url, headers=headers, data=payload)
+
+dict_response = json.loads(response.text)
+
+date = datetime.datetime.now().date()
+
+data = []
+
+for i in dict_response['Results']:
+    try:
+        agent = i['Individual'][0]['Name']
+        broker = i['Individual'][0]['Organization']['Name']
+        price = i['Property']['Price']
+        address = i['Property']['Address']['AddressText']
+        longitude = i['Property']['Address']['Longitude']
+        latitude = i['Property']['Address']['Latitude']
+        city, state, postal_code = parse_address(address)
+    except:
+        pass
+    row = {
+        'date' : date,
+        'agent' : agent,
+        'broker' : broker,
+        'price' : price,
+        'address' : address,
+        'city' : city,
+        'state' : state,
+        'postal_code' : postal_code,
+        'longitude' : longitude,
+        'latitude' : latitude
+        
+    }
+    data.append(row)
+
+df = pd.DataFrame(data)
+df.to_excel('data.xlsx',index=False)
+
+
+
+
 
 print(response.text)
