@@ -32,7 +32,7 @@ def parse_address(address):
 
 url = "https://api2.realtor.ca/Listing.svc/PropertySearch_Post"
 
-payload = "CurrentPage=3&Sort=6-D&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=40&ApplicationId=1&CultureId=1&Version=7.0"
+payload = "CurrentPage=12&Sort=6-A&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=48&ApplicationId=1&CultureId=1&Version=7.0"
 headers = {
   'accept': '*/*',
   'accept-language': 'en-US,en;q=0.9',
@@ -49,46 +49,80 @@ headers = {
   'sec-fetch-site': 'same-site',
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0'
 }
+# print(f'->Requesting URL {url}')
+# response = requests.request("POST", url, headers=headers, data=payload)
+# print(f'->{response.status_code}')
 
-response = requests.request("POST", url, headers=headers, data=payload)
+# dict_response = json.loads(response.text)
 
-dict_response = json.loads(response.text)
+# date = datetime.datetime.now().date()
 
-date = datetime.datetime.now().date()
+# unfiltered_data = []
 
-data = []
-
-for i in dict_response['Results']:
-    try:
-        agent = i['Individual'][0]['Name']
-        broker = i['Individual'][0]['Organization']['Name']
-        price = i['Property']['Price']
-        address = i['Property']['Address']['AddressText']
-        longitude = i['Property']['Address']['Longitude']
-        latitude = i['Property']['Address']['Latitude']
-        city, state, postal_code = parse_address(address)
-    except:
-        pass
-    row = {
-        'date' : date,
-        'agent' : agent,
-        'broker' : broker,
-        'price' : price,
-        'address' : address,
-        'city' : city,
-        'state' : state,
-        'postal_code' : postal_code,
-        'longitude' : longitude,
-        'latitude' : latitude
+# for i in dict_response['Results']:
+#     try:
+#         agent = i['Individual'][0]['Name']
+#         broker = i['Individual'][0]['Organization']['Name']
+#         price = i['Property']['Price']
+#         address = i['Property']['Address']['AddressText']
+#         longitude = i['Property']['Address']['Longitude']
+#         latitude = i['Property']['Address']['Latitude']
+#         city, state, postal_code = parse_address(address)
+#     except:
+#         pass
+#     row = {
+#         'date' : str(date),
+#         'agent' : agent,
+#         'broker' : broker,
+#         'price' : price,
+#         'address' : address,
+#         'city' : city.replace('\n','').split('|')[-1] if city else None,
+#         'state' : state.replace('\n','').split(' ')[0] if state else None,
+#         'postal_code' : postal_code,
+#         'longitude' : longitude,
+#         'latitude' : latitude
         
-    }
-    data.append(row)
+#     }
+#     unfiltered_data.append(row)
+try:
+    with open('output.json', "r") as json_file:
+        filtered_data = json.load(json_file)
+except FileNotFoundError:
+    filtered_data = {} 
 
-df = pd.DataFrame(data)
-df.to_excel('data.xlsx',index=False)
+
+# print('-> Filtering data')
+
+# for i in unfiltered_data:
+#     if i['postal_code']:
+#         postal_type = i['postal_code'][0:2]
+#         if postal_type not in filtered_data.keys():
+#             filtered_data[postal_type] = [i]
+#         else:
+#             filtered_data[postal_type].append(i)
+#     else:
+#         if 'Address not found' in filtered_data.keys():
+#             filtered_data['Address not found'].append(i)
+#         else:
+#             filtered_data['Address not found'] = [i]
+
+# with open('output.json', "w") as json_file:
+#     dumped_data = json.dump(filtered_data,json_file)
+
+
+print('->Writing excel file')
+with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
+
+    for key,value in filtered_data.items():
+        df = pd.DataFrame(value)
+        df.to_excel(writer, sheet_name=key, index=False)
 
 
 
 
 
-print(response.text)
+
+
+
+
+

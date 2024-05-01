@@ -1,30 +1,38 @@
 import datetime
 import re
+import json
+import pandas as pd
+from address import AddressParser,Address
 
-def parse_address(address):
-    # Regular expression pattern to match the postal code
-    postal_code_pattern = r'\b[A-Za-z]\d[A-Za-z]\s*\d[A-Za-z]\d\b'
+# ap = AddressParser()
 
-    # Regular expression pattern to match the city
-    city_pattern = r'([^,]+),'
+# def address_prs(address):
+#     parsed_address = ap.parse_address(address)
+#     print(parsed_address.state)
 
-    # Regular expression pattern to match the state
-    state_pattern = r',\s*([A-Za-z\s]+)'
-
-    # Search for postal code
-    postal_code_match = re.search(postal_code_pattern, address)
-    postal_code = postal_code_match.group() if postal_code_match else None
-
-    # Search for city
-    city_match = re.search(city_pattern, address)
-    city = city_match.group(1).strip() if city_match else None
-
-    # Search for state
-    state_match = re.search(state_pattern, address)
-    state = state_match.group(1).strip() if state_match else None
-
-    return city, state, postal_code
+# address_prs('146 EARLSCOURT AVE|Toronto, Ontario M6E4A9')
+# # with open('data.json', "r") as json_file:
+#     loaded_data = json.load(json_file)
 
 
-print(parse_address('#421 -170 SUMACH ST Toronto, Ontario M5A0C3'))
-print(datetime.datetime.now().date())
+
+# filtered_data = {}
+# for i in loaded_data:
+#     postal_type = i['postal_code'][0:2]
+#     if postal_type not in filtered_data.keys():
+#         filtered_data[postal_type] = [i]
+#     else:
+#         filtered_data[postal_type].append(i)
+
+# with open('output.json', "w") as json_file:
+#     dumped_data = json.dump(filtered_data,json_file)
+
+
+
+# with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
+
+#     for key,value in filtered_data.items():
+#         df = pd.DataFrame(value)
+#         df.to_excel(writer, sheet_name=key, index=False)
+
+
