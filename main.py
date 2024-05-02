@@ -4,6 +4,7 @@ import pandas as pd
 import json
 import datetime
 import re
+from utils import chk_duplicates
 
 def parse_address(address):
     # Regular expression pattern to match the postal code
@@ -32,7 +33,7 @@ def parse_address(address):
 
 url = "https://api2.realtor.ca/Listing.svc/PropertySearch_Post"
 
-payload = "CurrentPage=12&Sort=6-A&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=48&ApplicationId=1&CultureId=1&Version=7.0"
+payload = "CurrentPage=44&Sort=6-A&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=48&ApplicationId=1&CultureId=1&Version=7.0"
 headers = {
   'accept': '*/*',
   'accept-language': 'en-US,en;q=0.9',
@@ -72,13 +73,13 @@ headers = {
 #         pass
 #     row = {
 #         'date' : str(date),
-#         'agent' : agent,
-#         'broker' : broker,
-#         'price' : price,
 #         'address' : address,
 #         'city' : city.replace('\n','').split('|')[-1] if city else None,
 #         'state' : state.replace('\n','').split(' ')[0] if state else None,
 #         'postal_code' : postal_code,
+#         'agent' : agent,
+#         'broker' : broker,
+#         'price' : price,
 #         'longitude' : longitude,
 #         'latitude' : latitude
         
@@ -90,10 +91,20 @@ try:
 except FileNotFoundError:
     filtered_data = {} 
 
+i=0
+for key,value in filtered_data.items():
+    i = i+len(value)
+print(i)
 
 # print('-> Filtering data')
 
 # for i in unfiltered_data:
+#     duplicate = chk_duplicates('Data1.xlsx',i['address'])
+#     if duplicate == True:
+#         unfiltered_data.remove(i)
+#         print(i)
+#     else:
+#         pass
 #     if i['postal_code']:
 #         postal_type = i['postal_code'][0:2]
 #         if postal_type not in filtered_data.keys():
@@ -110,12 +121,12 @@ except FileNotFoundError:
 #     dumped_data = json.dump(filtered_data,json_file)
 
 
-print('->Writing excel file')
-with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
+# print('->Writing excel file')
+# with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
 
-    for key,value in filtered_data.items():
-        df = pd.DataFrame(value)
-        df.to_excel(writer, sheet_name=key, index=False)
+#     for key,value in filtered_data.items():
+#         df = pd.DataFrame(value)
+#         df.to_excel(writer, sheet_name=key, index=False)
 
 
 
