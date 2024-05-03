@@ -1,10 +1,4 @@
-import datetime
-import re
-import json
-import pandas as pd
-from address import AddressParser,Address
-
-# ap = AddressParser()
+#
 
 # def address_prs(address):
 #     parsed_address = ap.parse_address(address)
@@ -35,4 +29,7 @@ from address import AddressParser,Address
 #         df = pd.DataFrame(value)
 #         df.to_excel(writer, sheet_name=key, index=False)
 
+from datetime import datetime
 
+print(datetime.strptime("2024-05-01", "%Y-%m-%d"))
+print(tuple({1:1,2:1}.values()))

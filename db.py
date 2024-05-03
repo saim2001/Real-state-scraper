@@ -1,13 +1,14 @@
 import os
 import psycopg2 
 from psycopg2 import sql
+from psycopg2.errors import UniqueViolation,InFailedSqlTransaction
 import pandas as pd
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
-conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+conn = psycopg2.connect('postgresql://saim:DSkl7vw-AjHK2LJIguIlSw@redear-giraffe-8487.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/postgres?sslmode=verify-full')
 
 
 def convert_to_date(date_str):
@@ -40,6 +41,34 @@ def process_data(sheet):
     combined_df['address'] = combined_df['address'].apply(replace_not_found_addrs)
     insert_properties(combined_df)
 
+def insert_single_prop(tup):
+    with conn.cursor() as cur:
+                
+        query = sql.SQL("""
+                    INSERT INTO properties (
+                        date_scraped,
+                        address,
+                        city,
+                        state,
+                        postal_code,
+                        agent,
+                        broker,
+                        price_CAD,
+                        longitude,
+                        latitude
+                    ) VALUES (
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                    )
+                    """)
+        try:
+            cur.execute(query,tup)
+        except  (InFailedSqlTransaction,UniqueViolation):
+            print(f'duplicate found {tup}')
+            return 1
+        conn.commit()
+        return 0
+        
+    
 
 def insert_properties(df):
     with conn.cursor() as cur:
@@ -64,10 +93,11 @@ def insert_properties(df):
         for i in data:
             try:
                 cur.execute(query,i)
+                conn.commit()
             except:
                 pass
-        conn.commit()
+        
         cur.close()
         conn.close()
 
-process_data(r'C:\Users\saim rao\Desktop\realestatescrpaer\data.xlsx')
+# process_data(r'data_3.xlsx')
