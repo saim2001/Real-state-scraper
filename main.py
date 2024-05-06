@@ -36,7 +36,7 @@ def parse_address(address):
 # url = "https://api2.realtor.ca/Listing.svc/PropertySearch_Post"
 
 # # payload = "CurrentPage=54&Sort=1-D&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=true&RecordsPerPage=48&ApplicationId=1&CultureId=1&Version=7.0"
-# payload = "ZoomLevel=10&LatitudeMax=43.8389&LongitudeMax=-78.54970&LatitudeMin=43.44142&LongitudeMin=-79.84883&Sort=6-D&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=0&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=60&ApplicationId=1&CultureId=1&Version=7.0&CurrentPage=1"
+# payload = "ZoomLevel=10&LatitudeMax=43.90630&LongitudeMax=-78.72682&LatitudeMin=43.50922&LongitudeMin=-80.02595&Sort=6-D&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=0&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=60&ApplicationId=1&CultureId=1&Version=7.0&CurrentPage=30"
 # headers = {
 #   'accept': '*/*',
 #   'accept-language': 'en-US,en;q=0.9',
