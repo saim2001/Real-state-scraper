@@ -27,9 +27,7 @@
 
 #     for key,value in filtered_data.items():
 #         df = pd.DataFrame(value)
-#         df.to_excel(writer, sheet_name=key, index=False)
+#      datetime.strptime("2024-05-01", "%Y-%m-%d")   df.to_excel(writer, sheet_name=key, index=False)
 
-from datetime import datetime
-
-print(datetime.strptime("2024-05-01", "%Y-%m-%d"))
-print(tuple({1:1,2:1}.values()))
+for i in range(1,6):
+    print(i)

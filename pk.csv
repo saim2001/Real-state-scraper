@@ -1,0 +1,6 @@
+city,lat,lng,country,iso2,admin_name,capital,population,population_proper
+Karachi,24.8600,67.0100,Pakistan,PK,Sindh,admin,15738000,14910352
+Lahore,31.5497,74.3436,Pakistan,PK,Punjab,admin,12306000,11126000
+Kotla Qasim Khan,32.5833,73.7500,Pakistan,PK,Punjab,,3219375,3219375
+Faisalabad,31.4167,73.0911,Pakistan,PK,Punjab,minor,3203846,3203846
+

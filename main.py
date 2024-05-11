@@ -37,7 +37,7 @@ def parse_address(address):
 url = "https://api2.realtor.ca/Listing.svc/PropertySearch_Post"
 
 # payload = "CurrentPage=54&Sort=1-D&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=true&RecordsPerPage=48&ApplicationId=1&CultureId=1&Version=7.0"
-payload = "ZoomLevel=13&LatitudeMax=43.72774&LongitudeMax=-79.34926&LatitudeMin=43.64855&LongitudeMin=-79.50530&Sort=1-A&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=0&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=60&ApplicationId=1&CultureId=1&Version=7.0&CurrentPage=15"
+payload = "CurrentPage=4&Sort=6-D&GeoIds=g30_dpxnh9by&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=60&ApplicationId=1&CultureId=1&Version=7.0"
 headers = {
   'accept': '*/*',
   'accept-language': 'en-US,en;q=0.9',
@@ -145,12 +145,12 @@ with open('output.json', "w") as json_file:
     dumped_data = json.dump(filtered_data,json_file)
 
 
-print('->Writing excel file')
-with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
+# print('->Writing excel file')
+# with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
 
-    for key,value in filtered_data.items():
-        df = pd.DataFrame(value)
-        df.to_excel(writer, sheet_name=key, index=False)
+#     for key,value in filtered_data.items():
+#         df = pd.DataFrame(value)
+#         df.to_excel(writer, sheet_name=key, index=False)
 
 
 

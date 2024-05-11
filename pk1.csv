@@ -1,0 +1,10 @@
+city,lat,lng,country,iso2,admin_name,capital,population,population_proper
+Rawalpindi,33.6000,73.0333,Pakistan,PK,Punjab,minor,2098231,2098231
+Gujranwala,32.1567,74.1900,Pakistan,PK,Punjab,minor,2027001,2027001
+Peshawar,34.0144,71.5675,Pakistan,PK,Khyber Pakhtunkhwa,admin,1970042,1970042
+Multan,30.1978,71.4697,Pakistan,PK,Punjab,minor,1871843,1871843
+Hyderabad City,25.3792,68.3683,Pakistan,PK,Sindh,minor,1732693,1732693
+Islamabad,33.6931,73.0639,Pakistan,PK,Islamabad,primary,1014825,1014825
+Quetta,30.1833,67.0000,Pakistan,PK,Balochistan,admin,1001205,1001205
+Cantonment,31.5167,74.3833,Pakistan,PK,Punjab,,374872,374872
+Eminabad,32.0414,74.2600,Pakistan,PK,Punjab,,150646,150646
