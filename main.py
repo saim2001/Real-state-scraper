@@ -37,7 +37,7 @@ def parse_address(address):
 url = "https://api2.realtor.ca/Listing.svc/PropertySearch_Post"
 
 # payload = "CurrentPage=54&Sort=1-D&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=true&RecordsPerPage=48&ApplicationId=1&CultureId=1&Version=7.0"
-payload = "CurrentPage=4&Sort=6-D&GeoIds=g30_dpxnh9by&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=1&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=60&ApplicationId=1&CultureId=1&Version=7.0"
+payload = "ZoomLevel=10&LatitudeMax=43.93944&LongitudeMax=-78.51121&LatitudeMin=43.47584&LongitudeMin=-80.24156&Sort=6-A&GeoIds=g30_dpz89rm7&PropertyTypeGroupID=1&TransactionTypeId=2&PropertySearchTypeId=0&Currency=CAD&IncludeHiddenListings=false&RecordsPerPage=60&ApplicationId=1&CultureId=1&Version=7.0&CurrentPage=40"
 headers = {
   'accept': '*/*',
   'accept-language': 'en-US,en;q=0.9',
@@ -54,103 +54,120 @@ headers = {
   'sec-fetch-site': 'same-site',
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0'
 }
-# print(f'->Requesting URL {url}')
-# response = requests.request("POST", url, headers=headers, data=payload)
-# print(f'->{response.status_code}')
+def scrape_and_filter(filtered_data):
+    print(f'->Requesting URL {url}')
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print(f'->{response.status_code}')
 
-# dict_response = json.loads(response.text)
+    dict_response = json.loads(response.text)
 
-# date = datetime.now().date()
+    date = datetime.now().date()
 
-# unfiltered_data = []
-# print(f'results fetched {len(dict_response['Results'])}')
-# for i in dict_response['Results']:
-#     pprint.pprint(i)
-#     try:
-#         agent = i['Individual'][0]['Name']
-#     except:
-#         try:
-#             agent = i['Individual'][1]['Name']
-#         except:
-#             agent = None
-#     broker = i['Individual'][0]['Organization']['Name']
-#     try:
-#         price = i['Property']['Price']
-#     except:
-#         price = f"LeaseRent: {i['Property']['LeaseRent']}"
-#     address = i['Property']['Address']['AddressText']
-#     longitude = i['Property']['Address']['Longitude']
-#     latitude = i['Property']['Address']['Latitude']
-#     city, state, postal_code = parse_address(address)
-#     # except Exception as e :
-#     #     print(e)
-#     row = {
-#         'date' : str(date),
-#         'address' : address,
-#         'city' : city.replace('\n','').split('|')[-1] if city else None,
-#         'state' : state.replace('\n','').split(' ')[0] if state else None,
-#         'postal_code' : postal_code,
-#         'agent' : agent,
-#         'broker' : broker,
-#         'price' : price,
-#         'longitude' : longitude,
-#         'latitude' : latitude
+    unfiltered_data = []
+    print(f'results fetched {len(dict_response['Results'])}')
+    for i in dict_response['Results']:
+        pprint.pprint(i)
+        try:
+            agent = i['Individual'][0]['Name']
+        except:
+            try:
+                agent = i['Individual'][1]['Name']
+            except:
+                agent = None
+        broker = i['Individual'][0]['Organization']['Name']
+        try:
+            price = i['Property']['Price']
+        except:
+            price = f"LeaseRent: {i['Property']['LeaseRent']}"
+        address = i['Property']['Address']['AddressText']
+        longitude = i['Property']['Address']['Longitude']
+        latitude = i['Property']['Address']['Latitude']
+        city, state, postal_code = parse_address(address)
+        # except Exception as e :
+        #     print(e)
+        row = {
+            'date' : str(date),
+            'address' : address,
+            'city' : city.replace('\n','').split('|')[-1] if city else None,
+            'state' : state.replace('\n','').split(' ')[0] if state else None,
+            'postal_code' : postal_code,
+            'agent' : agent,
+            'broker' : broker,
+            'price' : price,
+            'longitude' : longitude,
+            'latitude' : latitude
+            
+        }
+        unfiltered_data.append(row)
+    print('-> Filtering data')
+
+    for i in unfiltered_data:
+
+        if i['postal_code']==None:
+            i['address'] = None
+        i['date'] = datetime.strptime(i['date'], "%Y-%m-%d")
+        i['longitude']  = str(i['longitude'])
+        i['latitude']  = str(i['latitude'])   
+        duplicate = insert_single_prop(tuple(i.values()))
+
+        if duplicate == 0:
+            i['date'] = str(i['date'])
+            if i['postal_code']:
+                postal_type = i['postal_code'][0:2]
+                if postal_type not in filtered_data.keys():
+                    filtered_data[postal_type] = [i]
+                else:
+                    filtered_data[postal_type].append(i)
+            else:
+                if 'Address not found' in filtered_data.keys():
+                    filtered_data['Address not found'].append(i)
+                else:
+                    filtered_data['Address not found'] = [i]
+        else:
+            pass
+            
         
-#     }
-#     unfiltered_data.append(row)
-try:
-    with open('output.json', "r") as json_file:
-        filtered_data = json.load(json_file)
-except FileNotFoundError:
-    filtered_data = {} 
-
-
-
-
-
-# print('-> Filtering data')
-
-# for i in unfiltered_data:
-
-#     if i['postal_code']==None:
-#         i['address'] = None
-#     i['date'] = datetime.strptime(i['date'], "%Y-%m-%d")
-#     i['longitude']  = str(i['longitude'])
-#     i['latitude']  = str(i['latitude'])   
-#     duplicate = insert_single_prop(tuple(i.values()))
-
-#     if duplicate == 0:
-#         i['date'] = str(i['date'])
-#         if i['postal_code']:
-#             postal_type = i['postal_code'][0:2]
-#             if postal_type not in filtered_data.keys():
-#                 filtered_data[postal_type] = [i]
-#             else:
-#                 filtered_data[postal_type].append(i)
-#         else:
-#             if 'Address not found' in filtered_data.keys():
-#                 filtered_data['Address not found'].append(i)
-#             else:
-#                 filtered_data['Address not found'] = [i]
-#     else:
-#         pass
-        
-    
-# i=0
-# for key,value in filtered_data.items():
-#     i = i+len(value)
-# print(i)
-
-# with open('output.json', "w") as json_file:
-#     dumped_data = json.dump(filtered_data,json_file)
-
-
-print('->Writing excel file')
-with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
-
+    i=0
     for key,value in filtered_data.items():
-        df = pd.DataFrame(value)
-        df.to_excel(writer, sheet_name=key, index=False)
+        i = i+len(value)
+    print(i)
+    return filtered_data
+
+
+def open_read():
+    try:
+        with open('output.json', "r") as json_file:
+            filtered_data = json.load(json_file)
+            return filtered_data
+    except FileNotFoundError:
+        filtered_data = {} 
+        return filtered_data
+
+
+
+
+
+
+def dump_file(filtered_data):
+
+    with open('output.json', "w") as json_file:
+        dumped_data = json.dump(filtered_data,json_file)
+
+def write_exl_file(filtered_data):
+    print('->Writing excel file')
+    with pd.ExcelWriter('output.xlsx', mode='a', engine='openpyxl') as writer:
+
+        for key,value in filtered_data.items():
+            df = pd.DataFrame(value)
+            df.to_excel(writer, sheet_name=key, index=False)
+data = open_read()
+
+# filt_data = scrape_and_filter(data)
+# dump_file(filt_data)
+
+write_exl_file(data)
+
+
 
 
 
